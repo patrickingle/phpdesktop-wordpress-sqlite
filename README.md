@@ -26,3 +26,11 @@ settings.json: port number must be defined to 8080 (default was 0), otherwise Wo
 
 wordpress.db: place outside the root path in ../data and specify in the wp-config.php
 
+# Deploy on LAMP
+
+1. Copy the entire www folder to your Linux server (www -> public_html or htdocs, NOT public_html/www)
+
+2. Copy the entire data folder to your Linux server, outside the root
+
+3. Ensure Linux file permissions are set properly
+
