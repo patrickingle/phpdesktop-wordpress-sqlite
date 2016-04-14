@@ -20,7 +20,7 @@ SQLite -> https://wordpress.org/plugins/sqlite-integration/
 
 # Additional Tips
 
-php.ini: max_execution_time must be increased to 90 (default wsa 30)
+php.ini: max_execution_time must be increased to 90 (default was 30)
 
 settings.json: port number must be defined to 8080 (default was 0), otherwise WordPress will not run on subsequent launches
 
