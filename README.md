@@ -5,9 +5,10 @@ Using PHP Desktop desktop GUI framework for IE, a complete working version of Wo
 
 # Usage
 
-1. double click phpdesktop-msie.exe file
-2. Scroll down to Log In link and click link.
-3. Use the userid: admin and password: password
+1. Download phpdesktop-msie.zip and extract in the same folder
+2. Double click phpdesktop-msie.exe to launch
+3. Scroll down to Log In link and click link.
+4. Use the userid: admin and password: password
 
 # References
 
