@@ -22,7 +22,7 @@
         "fixed_title": ""
     },
     "web_server": {
-        "listen_on": ["127.0.0.1", 0],
+        "listen_on": ["127.0.0.1", 8080],
         "www_directory": "www",
         "index_files": "www/index.php",
         "cgi_interpreter": "php/php-cgi.exe",

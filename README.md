@@ -5,8 +5,10 @@ Using PHP Desktop desktop GUI framework for IE, a complete working version of Wo
 
 # Usage
 
-1. Download phpdesktop-msie.zip and extract in the same folder
-2. Double click phpdesktop-msie.exe to launch
+1. Download PHPDesktop from https://github.com/cztomczak/phpdesktop/wiki/Download-MSIE
+2. Download these files or clone in Git.
+3. Extract the files and copy phpdesktop-msie.exe to this folder
+4. Double click phpdesktop-msie.exe to launch
 3. Scroll down to Log In link and click link.
 4. Use the userid: admin and password: password
 
@@ -18,8 +20,9 @@ SQLite -> https://wordpress.org/plugins/sqlite-integration/
 
 # Additional Tips
 
-This version of PHP Desktop was recompiled to force the use of port 8080 in order for WordPress to function correctly.
+php.ini: max_execution_time must be increased to 90 (default wsa 30)
 
-Once PHPDesktop is started, you can access from another browser using the url http://127.0.0.1:8080
+settings.json: port number must be defined to 8080 (default was 0), otherwise WordPress will not run on subsequent launches
 
-Make sure you do not have anything running on port 8080 before starting PHPDesktop.
+wordpress.db: place outside the root path in ../data and specify in the wp-config.php
+
