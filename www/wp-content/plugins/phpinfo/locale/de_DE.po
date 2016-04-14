@@ -1,0 +1,118 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: phpinfo\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2007-09-11 10:23+0100\n"
+"Last-Translator: rr <rol@rm-r.at>\n"
+"Language-Team: Roland Rust <wordpress@designpraxis.at>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: AUSTRIA\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: E:\\www.designpraxis.at\\wordpress\\wp-content\\plugins\\\n"
+"X-Poedit-SearchPath-0: phpinfo\n"
+
+#: phpinfo/phpinfo.php:26
+msgid "Php scripts are allowed to run for"
+msgstr "Php Skripte haben eine maximale Laufzeit von"
+
+#: phpinfo/phpinfo.php:26
+#: phpinfo/phpinfo.php:28
+#: phpinfo/phpinfo.php:30
+msgid "seconds"
+msgstr "Sekunden"
+
+#: phpinfo/phpinfo.php:28
+msgid "Your webserver will wait for form data for"
+msgstr "Der Webserver wartet auf daten für"
+
+#: phpinfo/phpinfo.php:30
+msgid "Your webserver won't wait for form data longer than"
+msgstr "Der Webserver wartet auf Firmulardaten nicht länger als"
+
+#: phpinfo/phpinfo.php:33
+msgid "File uploads are enabled"
+msgstr "Datei Uploads sind aktiviert"
+
+#: phpinfo/phpinfo.php:35
+msgid "File uploads are disabled"
+msgstr "Datei Uploads sind deaktiviert"
+
+#: phpinfo/phpinfo.php:37
+msgid "File Uploads are limited to"
+msgstr "Datei Uploads sind limitiert auf"
+
+#: phpinfo/phpinfo.php:38
+msgid "Post data is limited to"
+msgstr "POST Daten sind limitiert auf"
+
+#: phpinfo/phpinfo.php:40
+msgid "Global variables are registered"
+msgstr "Globale Variablen sin registriert"
+
+#: phpinfo/phpinfo.php:42
+msgid "Global variables are not registered"
+msgstr "Globale Variablen sind nicht registriert"
+
+#: phpinfo/phpinfo.php:45
+msgid "Safe Mode is On"
+msgstr "Safe Mode ist aktiviert"
+
+#: phpinfo/phpinfo.php:47
+msgid "Safe Mode is Off"
+msgstr "Safe Mode ist deaktiviert"
+
+#: phpinfo/phpinfo.php:50
+msgid "Remote files can be opended by fopen()"
+msgstr "Entfernte Dateien können mit fopen() geöffnet werden"
+
+#: phpinfo/phpinfo.php:52
+msgid "Remote files can be not opended by fopen()"
+msgstr "Entfernte Dateien können nicht mit fopen() geöffnet werden"
+
+#: phpinfo/phpinfo.php:56
+msgid "Phpinfo"
+msgstr "Phpinfo"
+
+#: phpinfo/phpinfo.php:60
+msgid "Configuration"
+msgstr "Einstellungen"
+
+#: phpinfo/phpinfo.php:61
+msgid "php_ini"
+msgstr "php_ini"
+
+#: phpinfo/phpinfo.php:62
+msgid "value"
+msgstr "Wert"
+
+#: phpinfo/phpinfo.php:81
+msgid "Copy the contents of the field below for posting within support forums"
+msgstr "Kopieren Sie den Inhalt des untenstehenden Feldes um es in Support Foren zu posten"
+
+#: phpinfo/phpinfo.php:83
+msgid "PHP information for"
+msgstr "PHP Informationen für"
+
+#: phpinfo/phpinfo.php:91
+msgid "Other information:"
+msgstr "Andere Informationen"
+
+#: phpinfo/phpinfo.php:125
+msgid "Running into Troubles? Features to suggest?"
+msgstr "Haben Sie Schwierigkeiten mit diesem Plugin? Oder Verbesserungsvorschläge?"
+
+#: phpinfo/phpinfo.php:127
+msgid "Drop me a line"
+msgstr "Schreiben Sie mir"
+
+#: phpinfo/phpinfo.php:132
+msgid "Do you like this Plugin?"
+msgstr "Finden Sie dieses Plugin nützlich?"
+
+#: phpinfo/phpinfo.php:133
+msgid "Consider to"
+msgstr ""
+

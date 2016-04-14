@@ -1,0 +1,82 @@
+
+@import url(http://fonts.googleapis.com/css?family=Lato);
+
+.infohouse_heading {
+
+	font-family: "Lato", sans-serif;
+
+	font-size: 29px !important;
+
+}
+
+.infohouse_settings_page {
+
+	padding: 20px;
+
+	font-family: "Lato", sans-serif;
+	
+}
+
+.infohouse_table {
+	
+    border: 1px solid rgba(0, 0, 0, 0.08);
+	
+    margin: 0 auto 0 auto;
+	
+    background-color: #fff;
+	
+    border-collapse: collapse;
+	
+}
+
+.infohouse_table tr td {
+	
+    padding: 0px 20px;
+	
+    margin: 0;
+	
+    border: 1px solid rgba(195, 195, 195, 0.08);
+	
+    text-align: center;
+	
+}
+
+.infohouse_table tr.gray td {
+	
+    padding: 0px 20px;
+	
+    margin: 0;
+	
+	background: #FBFBFB;
+	
+    border: 1px solid rgba(195, 195, 195, 0.08);
+	
+    text-align: center;
+	
+}
+
+.infohouse_table tr td p {
+	
+	padding: 0;
+	
+	margin: 0;
+	
+    font-family: 'Lato';
+	
+    font-weight: 400;
+	
+    font-size: 12px;
+	
+}
+
+.infohouse_table tr td.view-more-info {
+	
+	padding: 15px 0 1px 0;
+	
+}
+
+.dashboard_inf_table {
+	
+	width: 100%;
+	
+}
