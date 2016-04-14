@@ -34,6 +34,10 @@ wordpress.db: place outside the root path in ../data and specify in the wp-confi
 
 3. Ensure Linux file permissions are set properly
 
+# Example of Live WordPress-SQLite site
+
+http://wordpress-sqlite.netne.net/
+
 # Donations Appreciated & Accepted
 
 Click (or copy & paste) here: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AY6K2EV5VH9ZN
