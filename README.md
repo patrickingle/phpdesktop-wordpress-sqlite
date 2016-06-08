@@ -6,11 +6,17 @@ Using PHP Desktop desktop GUI framework for IE, a complete working version of Wo
 # Usage
 
 1. Download PHPDesktop from https://github.com/cztomczak/phpdesktop/wiki/Download-MSIE
-2. Download these files or clone in Git.
+2. Download these files or clone in Git (`git clone`)
 3. Extract the files and copy phpdesktop-msie.exe to this folder
 4. Double click phpdesktop-msie.exe to launch
 3. Scroll down to Log In link and click link.
 4. Use the userid: admin and password: password
+
+# Using PHP's local server 
+- Clone repo `git clone <address> my-project`
+- Change directory `cd my-project/www`
+- Start PHP local server `php -S localhost:8080`
+- In web browser, go to address http://localhost:8080/
 
 # References
 
