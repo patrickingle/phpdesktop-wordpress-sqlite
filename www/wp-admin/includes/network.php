@@ -118,7 +118,7 @@ function network_step1( $errors = false ) {
 
 	$hostname = get_clean_basedomain();
 	$has_ports = strstr( $hostname, ':' );
-	if ( ( false !== $has_ports && ! in_array( $has_ports, array( ':80', ':443', ':8080' ) ) ) ) {
+	if ( ( false !== $has_ports && ! in_array( $has_ports, array( ':80', ':443' ) ) ) ) {
 		echo '<div class="error"><p><strong>' . __( 'ERROR:') . '</strong> ' . __( 'You cannot install a network of sites with your server address.' ) . '</p></div>';
 		echo '<p>' . sprintf(
 			/* translators: %s: port number */
@@ -159,7 +159,7 @@ function network_step1( $errors = false ) {
 		$subdomain_install = true;
 	} else {
 		$subdomain_install = false;
-		if ( $got_mod_rewrite = got_mod_rewrite() ) { // dangerous assumptions
+		if ( $got_mod_rewrite = got_mod_rewrite() ) { // dangerous assumptions 
 			echo '<div class="updated inline"><p><strong>' . __( 'Note:' ) . '</strong> ';
 			/* translators: %s: mod_rewrite */
 			printf( __( 'Please make sure the Apache %s module is installed as it will be used at the end of this installation.' ),
