@@ -2,8 +2,8 @@
 Contributors: usmanaliqureshi
 Tags: admin, dashboard, widget, server, info, PHP, version, operating system
 Requires at least: 3.0
-Tested up to: 4.4.2
-Stable tag: 4.4
+Tested up to: 4.5.2
+Stable tag: 4.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,7 @@ You will see the information about:
 * Server Hostname
 * MySQL Version
 * System Uptime
+* WordPress Memory Limit
 
 Please rate the Plugin if you find it useful, thanks.
 
@@ -47,6 +48,10 @@ Yes, it works with all major PHP versions and I have tested it with PHP version 
 2. WordPress Dashboard Widget.
 
 == Changelog ==
+
+= 2.0 =
+* Removed MySQL Client Version
+* Added WordPress Memory Limit
 
 = 1.0 =
 * Initial Release

@@ -3,8 +3,8 @@ Contributors: phkcorp2005
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9674139
 Tags: smarty wp-smarty
 Requires at least: 2.8.6
-Tested up to: 4.3
-Stable tag: 3.1.27
+Tested up to: 4.6
+Stable tag: 3.1.30
 
 Smarty for Wordpress permits your Smarty template file to be embedded in a Wordpress post/page.
 
@@ -21,7 +21,7 @@ There are many useful frameworks written in Smarty and NOT Wordpress, like XCart
 Stop! Don't throw away that Smarty Template file, Download Smarty for Wordpress, install, activate and use that Smarty template file in Wordpress TODAY!!!
 
 The following publication, "Guide to Using Smarty for Wordpress Plugin" available on
-Amazon at (http://www.amazon.com/dp/B00K5XTPL2) shows how to implement this framework plugin
+Amazon at (http://www.amazon.com/dp/B00K5XTPL2) or Barnes & Noble (http://www.barnesandnoble.com/w/guide-to-the-smarty-for-wordpress-plugin-patrick-ingle/1123770360?ean=2940158127281) shows how to implement this framework plugin
 in your wordpress blog.
 
 
@@ -80,6 +80,7 @@ if you want to pass multiple variables to the smarty template, use
 	value holds a comma delimited list of associated values for the variable names.
 
 The admin page under Settings permits setting the following Smarty attributes:
+- SmartyBC, for enabling backward compatibility
 - Auto literal
 - Cache lifetime
 - Cache modified check
@@ -144,6 +145,12 @@ Please do not be afraid of asking questions?<br>
 * use the syntax global $wpdb; within the smarty loader file.
 
 == Changelog ==
+= 3.1.30.1 =
+* Fix loading issues with SmartyBC class
+
+= 3.1.30 =
+* Updated to Smarty version 3.1.30, added SmartyBC setting
+
 = 3.1.27.1 =
 * Updated Admin page
 
