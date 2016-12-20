@@ -1,0 +1,187 @@
+#Thresholds which, if exceeded will cause a rule group to block
+scores.sqli = 100
+scores.xss = 100
+scores.rce = 100
+
+# Blacklisted URL/params to not whitelist
+blacklistParam(url='/\/wp\-admin[\/]+admin\-ajax\.php/i', param=request.queryString.action)
+blacklistParam(url='/\/wp\-admin[\/]+admin\-ajax\.php/i', param=request.queryString.img)
+blacklistParam(url='/\/wp\-admin[\/]+admin\-ajax\.php/i', param=request.body.action)
+blacklistParam(url='/\/wp\-admin[\/]+admin\-ajax\.php/i', param=request.body.img)
+
+# Netsparker
+blacklistParam(url='/.*/', param=request.body.nsextt)
+
+# File uploads
+blacklistParam(url='/\/uploadify\.php$/i', param=request.fileNames.Filedata)
+blacklistParam(url='/.*/', param=request.fileNames.yiw_contact)
+blacklistParam(url='/\/license\.php$/i', param=request.fileNames.filename)
+blacklistParam(url='/\/wp\-admin[\/]+admin\-ajax\.php$/i', param=request.fileNames.update_file)
+blacklistParam(url='/tiny_mce[\/]+plugins[\/]+tinybrowser[\/]+upload_file\.php$/i', param=request.fileNames.Filedata)
+blacklistParam(url='/elfinder[\/]+php[\/]+connector\.minimal\.php$/i', param=request.fileNames.upload)
+
+
+# Whitelisted URL/params to not run through the rules
+# Trackbacks
+whitelistParam(url='/.*/', param=request.body.excerpt)
+
+# Comments
+whitelistParam(url='/wp-comments-post\.php$/i', param=request.body.comment, rules=[3, 12])
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.content)
+
+# WordPress SEO / Auto-saving
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.data)
+
+# WordPress Plugins/Posts Search
+whitelistParam(url='/\/wp-admin\/(?:network\/)?(?:plugin(?:s|-install)|edit)\.php$/i', param=request.queryString.s)
+
+# WAF config page
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.whitelistedPath)
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.whitelistedParam)
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.oldWhitelistedPath)
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.oldWhitelistedParam)
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.newWhitelistedPath)
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.newWhitelistedParam)
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.bannedURLs)
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.scan_include_extra)
+
+# WordPress misc
+whitelistParam(url='/\/wp-admin\/(?:network\/)?(?:plugin|theme)-editor\.php$/i', param=request.body.newcontent)
+whitelistParam(url='/.{0,1}/', param=request.queryString._wp_http_referer)
+
+# Plugins page
+whitelistParam(url='/\/wp-admin\/(?:network\/)?plugins\.php$/i', param=request.queryString.plugin)
+whitelistParam(url='/\/wp-admin\/(?:network\/)?plugins\.php$/i', param=request.queryString.action)
+whitelistParam(url='/\/wp-admin\/(?:network\/)?plugins\.php$/i', param=request.queryString.checked)
+whitelistParam(url='/\/wp-admin\/(?:network\/)?plugins\.php$/i', param=request.body.action)
+whitelistParam(url='/\/wp-admin\/(?:network\/)?plugins\.php$/i', param=request.body.checked)
+whitelistParam(url='/\/wp-admin\/(?:network\/)?plugins\.php$/i', param=request.body.submit)
+
+# Options page
+whitelistParam(url='/\/wp-admin\/options\.php$/i', param=request.body.blogname)
+whitelistParam(url='/\/wp-admin\/options\.php$/i', param=request.body.blogdescription)
+whitelistParam(url='/\/wp-admin\/options\.php$/i', param=request.body.siteurl)
+whitelistParam(url='/\/wp-admin\/options\.php$/i', param=request.body.home)
+whitelistParam(url='/\/wp-admin\/options\.php$/i', param=request.body.admin_email)
+whitelistParam(url='/\/wp-admin\/options\.php$/i', param=request.body.moderation_keys)
+whitelistParam(url='/\/wp-admin\/options\.php$/i', param=request.body.blacklist_keys)
+whitelistParam(url='/\/wp-admin\/options\.php$/i', param=request.body.permalink_structure)
+whitelistParam(url='/\/wp-admin\/options\.php$/i', param=request.body.category_base)
+whitelistParam(url='/\/wp-admin\/options\.php$/i', param=request.body.tag_base)
+
+whitelistParam(url='/\/wp-admin\/edit-comments\.php$/i', param=request.queryString.s)
+
+# WordPress login page
+whitelistParam(url='/\/wp-login\.php$/i', param=request.body.log)
+whitelistParam(url='/\/wp-login\.php$/i', param=request.body.pwd)
+whitelistParam(url='/\/wp-login\.php$/i', param=request.body.redirect_to)
+
+# Multisite Admin Pages
+whitelistParam(url='/\/wp-admin\/network\/(?:user|site)s\.php$/i', param=request.queryString.s)
+whitelistParam(url='/\/wp-admin\/network\/site-new\.php$/i', param=request.body.blog)
+
+# Deleting WAF whitelist items
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.deletedWhitelistedPath)
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.deletedWhitelistedParam)
+
+# iThemes Security
+whitelistParam(url='/\/wp-admin\/options\.php$/i', param=request.body.itsec_global.log_location)
+whitelistParam(url='/\/wp-admin\/options\.php$/i', param=request.body.itsec_backup.location)
+whitelistParam(url='/\/wp-admin\/admin-ajax\.php$/i', param=request.body.dir)
+
+# PHPMyAdmin
+whitelistParam(url='/(?:lint|import)\.php$/i', param=request.body.sql_query)
+
+# SQLi detection
+sqliRegex = '/(?:[^\w<]|\/\*\![0-9]*|^)(?:
+@@HOSTNAME|
+ALTER|ANALYZE|ASENSITIVE|
+BEFORE|BENCHMARK|BETWEEN|BIGINT|BINARY|BLOB|
+CALL|CASE|CHANGE|CHAR|CHARACTER|CHAR_LENGTH|COLLATE|COLUMN|CONCAT|CONDITION|CONSTRAINT|CONTINUE|CONVERT|CREATE|CROSS|CURRENT_DATE|CURRENT_TIME|CURRENT_TIMESTAMP|CURRENT_USER|CURSOR|
+DATABASE|DATABASES|DAY_HOUR|DAY_MICROSECOND|DAY_MINUTE|DAY_SECOND|DECIMAL|DECLARE|DEFAULT|DELAYED|DELETE|DESCRIBE|DETERMINISTIC|DISTINCT|DISTINCTROW|DOUBLE|DROP|DUAL|DUMPFILE|
+EACH|ELSE|ELSEIF|ELT|ENCLOSED|ESCAPED|EXISTS|EXIT|EXPLAIN|EXTRACTVALUE|
+FETCH|FLOAT|FLOAT4|FLOAT8|FORCE|FOREIGN|FROM|FULLTEXT|
+GRANT|GROUP|HAVING|HEX|HIGH_PRIORITY|HOUR_MICROSECOND|HOUR_MINUTE|HOUR_SECOND|
+IFNULL|IGNORE|INDEX|INFILE|INNER|INOUT|INSENSITIVE|INSERT|INTERVAL|ISNULL|ITERATE|
+JOIN|KILL|LEADING|LEAVE|LIMIT|LINEAR|LINES|LOAD|LOAD_FILE|LOCALTIME|LOCALTIMESTAMP|LOCK|LONG|LONGBLOB|LONGTEXT|LOOP|LOW_PRIORITY|
+MASTER_SSL_VERIFY_SERVER_CERT|MATCH|MAXVALUE|MEDIUMBLOB|MEDIUMINT|MEDIUMTEXT|MID|MIDDLEINT|MINUTE_MICROSECOND|MINUTE_SECOND|MODIFIES|
+NATURAL|NO_WRITE_TO_BINLOG|NULL|NUMERIC|OPTION|ORD|ORDER|OUTER|OUTFILE|
+PRECISION|PRIMARY|PRIVILEGES|PROCEDURE|PROCESSLIST|PURGE|
+RANGE|READ_WRITE|REGEXP|RELEASE|REPEAT|REQUIRE|RESIGNAL|RESTRICT|RETURN|REVOKE|RLIKE|ROLLBACK|
+SCHEMA|SCHEMAS|SECOND_MICROSECOND|SELECT|SENSITIVE|SEPARATOR|SHOW|SIGNAL|SLEEP|SMALLINT|SPATIAL|SPECIFIC|SQLEXCEPTION|SQLSTATE|SQLWARNING|SQL_BIG_RESULT|SQL_CALC_FOUND_ROWS|SQL_SMALL_RESULT|STARTING|STRAIGHT_JOIN|SUBSTR|
+TABLE|TERMINATED|TINYBLOB|TINYINT|TINYTEXT|TRAILING|TRANSACTION|TRIGGER|
+UNDO|UNHEX|UNION|UNLOCK|UNSIGNED|UPDATE|UPDATEXML|USAGE|USING|UTC_DATE|UTC_TIME|UTC_TIMESTAMP|
+VALUES|VARBINARY|VARCHAR|VARCHARACTER|VARYING|WHEN|WHERE|WHILE|WRITE|YEAR_MONTH|ZEROFILL)(?=[^\w]|$)/ix'
+
+
+xssRegex = '/(?:
+#tags
+(?:\<|\+ADw\-|\xC2\xBC)(script|iframe|svg|object|embed|applet|link|style|meta|\/\/|\?xml\-stylesheet)(?:[^\w]|\xC2\xBE)|
+#protocols
+(?:^|[^\w])(?:(?:\s*(?:&\#(?:x0*6a|0*106)|j)\s*(?:&\#(?:x0*61|0*97)|a)\s*(?:&\#(?:x0*76|0*118)|v)\s*(?:&\#(?:x0*61|0*97)|a)|\s*(?:&\#(?:x0*76|0*118)|v)\s*(?:&\#(?:x0*62|0*98)|b)|\s*(?:&\#(?:x0*65|0*101)|e)\s*(?:&\#(?:x0*63|0*99)|c)\s*(?:&\#(?:x0*6d|0*109)|m)\s*(?:&\#(?:x0*61|0*97)|a)|\s*(?:&\#(?:x0*6c|0*108)|l)\s*(?:&\#(?:x0*69|0*105)|i)\s*(?:&\#(?:x0*76|0*118)|v)\s*(?:&\#(?:x0*65|0*101)|e))\s*(?:&\#(?:x0*73|0*115)|s)\s*(?:&\#(?:x0*63|0*99)|c)\s*(?:&\#(?:x0*72|0*114)|r)\s*(?:&\#(?:x0*69|0*105)|i)\s*(?:&\#(?:x0*70|0*112)|p)\s*(?:&\#(?:x0*74|0*116)|t)|\s*(?:&\#(?:x0*6d|0*109)|m)\s*(?:&\#(?:x0*68|0*104)|h)\s*(?:&\#(?:x0*74|0*116)|t)\s*(?:&\#(?:x0*6d|0*109)|m)\s*(?:&\#(?:x0*6c|0*108)|l)|\s*(?:&\#(?:x0*6d|0*109)|m)\s*(?:&\#(?:x0*6f|0*111)|o)\s*(?:&\#(?:x0*63|0*99)|c)\s*(?:&\#(?:x0*68|0*104)|h)\s*(?:&\#(?:x0*61|0*97)|a)|\s*(?:&\#(?:x0*64|0*100)|d)\s*(?:&\#(?:x0*61|0*97)|a)\s*(?:&\#(?:x0*74|0*116)|t)\s*(?:&\#(?:x0*61|0*97)|a))\s*(?:&\#(?:x0*3a|0*58)|\:)|
+#css expression
+(?:^|[^\w])(?:(?:\\0*65|\\0*45|e)(?:\/\*.*?\*\/)*(?:\\0*78|\\0*58|x)(?:\/\*.*?\*\/)*(?:\\0*70|\\0*50|p)(?:\/\*.*?\*\/)*(?:\\0*72|\\0*52|r)(?:\/\*.*?\*\/)*(?:\\0*65|\\0*45|e)(?:\/\*.*?\*\/)*(?:\\0*73|\\0*53|s)(?:\/\*.*?\*\/)*(?:\\0*73|\\0*53|s)(?:\/\*.*?\*\/)*(?:\\0*69|\\0*49|i)(?:\/\*.*?\*\/)*(?:\\0*6f|\\0*4f|o)(?:\/\*.*?\*\/)*(?:\\0*6e|\\0*4e|n))[^\w]*?(?:\\0*28|\()|
+#css properties
+(?:^|[^\w])(?:(?:(?:\\0*62|\\0*42|b)(?:\/\*.*?\*\/)*(?:\\0*65|\\0*45|e)(?:\/\*.*?\*\/)*(?:\\0*68|\\0*48|h)(?:\/\*.*?\*\/)*(?:\\0*61|\\0*41|a)(?:\/\*.*?\*\/)*(?:\\0*76|\\0*56|v)(?:\/\*.*?\*\/)*(?:\\0*69|\\0*49|i)(?:\/\*.*?\*\/)*(?:\\0*6f|\\0*4f|o)(?:\/\*.*?\*\/)*(?:\\0*72|\\0*52|r)(?:\/\*.*?\*\/)*)|(?:(?:\\0*2d|\\0*2d|-)(?:\/\*.*?\*\/)*(?:\\0*6d|\\0*4d|m)(?:\/\*.*?\*\/)*(?:\\0*6f|\\0*4f|o)(?:\/\*.*?\*\/)*(?:\\0*7a|\\0*5a|z)(?:\/\*.*?\*\/)*(?:\\0*2d|\\0*2d|-)(?:\/\*.*?\*\/)*(?:\\0*62|\\0*42|b)(?:\/\*.*?\*\/)*(?:\\0*69|\\0*49|i)(?:\/\*.*?\*\/)*(?:\\0*6e|\\0*4e|n)(?:\/\*.*?\*\/)*(?:\\0*64|\\0*44|d)(?:\/\*.*?\*\/)*(?:\\0*69|\\0*49|i)(?:\/\*.*?\*\/)*(?:\\0*6e|\\0*4e|n)(?:\/\*.*?\*\/)*(?:\\0*67|\\0*47|g)(?:\/\*.*?\*\/)*))[^\w]*(?:\\0*3a|\\0*3a|:)[^\w]*(?:\\0*75|\\0*55|u)(?:\\0*72|\\0*52|r)(?:\\0*6c|\\0*4c|l)|
+#properties
+(?:^|[^\w])(?:on(?:abort|activate|afterprint|afterupdate|autocomplete|autocompleteerror|beforeactivate|beforecopy|beforecut|beforedeactivate|beforeeditfocus|beforepaste|beforeprint|beforeunload|beforeupdate|blur|bounce|cancel|canplay|canplaythrough|cellchange|change|click|close|contextmenu|controlselect|copy|cuechange|cut|dataavailable|datasetchanged|datasetcomplete|dblclick|deactivate|drag|dragend|dragenter|dragleave|dragover|dragstart|drop|durationchange|emptied|encrypted|ended|error|errorupdate|filterchange|finish|focus|focusin|focusout|formaction|formchange|forminput|hashchange|help|input|invalid|keydown|keypress|keyup|languagechange|layoutcomplete|load|loadeddata|loadedmetadata|loadstart|losecapture|message|mousedown|mouseenter|mouseleave|mousemove|mouseout|mouseover|mouseup|mousewheel|move|moveend|movestart|mozfullscreenchange|mozfullscreenerror|mozpointerlockchange|mozpointerlockerror|offline|online|page|pagehide|pageshow|paste|pause|play|playing|popstate|progress|propertychange|ratechange|readystatechange|reset|resize|resizeend|resizestart|rowenter|rowexit|rowsdelete|rowsinserted|scroll|search|seeked|seeking|select|selectstart|show|stalled|start|storage|submit|suspend|timer|timeupdate|toggle|unload|volumechange|waiting|webkitfullscreenchange|webkitfullscreenerror|wheel)|data\-bind|ev:event)[^\w]
+)/ix'
+
+# User Roles Manager Priviledge Escalation <= 4.24
+if (notEquals('', request.body.ure_other_roles) and
+	match('#/wp\-admin/(network/)?(profile|user-new)\.php#i', request.path) and
+	currentUserIsNot('administrator', server.empty)):
+	block(id=18, category='priv-esc', description='User Roles Manager Priviledge Escalation <= 4.24')
+
+# Whitelisted WordPress URLs
+if ((match('#/wp\-admin/(network/)?(post|profile|user-new|settings)\.php$#i', server.script_filename)) or
+	(match('#/wp\-admin/admin\-ajax\.php$#i', server.script_filename) and (
+		equals('wordfence_loadLiveTraffic', request.body.action) or
+		equals('wordfence_ticker', request.body.action)
+	))):
+	allow(id=1, category='whitelist', description='Whitelisted URL')
+
+# Slider revolution
+if (match('/\/wp\-admin[\/]+admin\-ajax\.php/', request.path) and (
+	(equals('revslider_show_image', request.queryString.action) and match('/\.php$/i', request.queryString.img)) or
+	(equals('revslider_show_image', request.body.action) and match('/\.php$/i', request.body.img))
+)):
+	block(id=2, category='lfi', description='Slider Revolution: Local File Inclusion')
+
+# dzs-videogallery 8.80
+if (match('/dzs\-videogallery[\/]+admin[\/]+(?:playlist|tag)seditor[\/]+popup\.php/', request.path) and contains("'", request.queryString.initer)):
+	blockXSS(id=15, category='xss', description='dzs-videogallery 8.80 XSS HTML injection in inline JavaScript')
+
+# Simple Ads Manager <= 2.9.4.116 - SQL Injection: https://wpvulndb.com/vulnerabilities/8357
+if (match('/simple-ads-manager[\/]+sam-ajax-loader\.php/', request.path) and
+	match(sqliRegex, base64decode(request.body.wc))):
+	block(id=16, category='sqli', description='Simple Ads Manager <= 2.9.4.116 - SQL Injection')
+
+# Gwolle Guestbook <= 1.5.3 - Remote File Inclusion (RFI): https://wpvulndb.com/vulnerabilities/8218
+if (match('/gwolle\-gb[\/]+frontend[\/]+captcha[\/]+ajaxresponse\.php/', request.path) and match('/.*/', request.queryString.abspath)):
+	block(id=17, category='rfi', description='Gwolle Guestbook <= 1.5.3 - Remote File Inclusion')
+
+# SQLi detection
+if (matchCount(sqliRegex, request.body, request.queryString)):
+	failSQLi(id=3, category='sqli', score=40, description='SQL Injection')
+
+# blacklisted tags, protocols and attributes
+if (matchCount(xssRegex, request.body, request.queryString)):
+	failXSS(id=9, category='xss', score=100, description='XSS: Cross Site Scripting')
+
+# Shell file uploads
+if (match('/\.(p(h(p|tml)[0-9]?|l|y)|(j|a)sp|aspx|sh|shtml|html?|cgi|htaccess)($|\.)/i', request.fileNames)):
+	block(id=11, category='file_upload', description='Malicous File Upload')
+
+# Directory traversal
+if (match('/(^|\/|\\)\.\.(\\|\/)/', request.body, request.queryString)):
+	block(id=12, category='lfi', description='Directory Traversal')
+
+# LFI absolute paths
+if (match('/^\/(?:\.\/)*(?:var|home|usr|mnt|media|etc|tmp|dev|proc)\//i', request.body, request.queryString)):
+	block(id=13, category='lfi', description='LFI: Local File Inclusion')
+
+# XXE
+if (match('/<\!(?:DOCTYPE|ENTITY)\s+(?:%\s*)?\w+\s+SYSTEM/i', request.body, request.queryString)):
+	block(id=14, category='xxe', description='XXE: External Entity Expansion')
+

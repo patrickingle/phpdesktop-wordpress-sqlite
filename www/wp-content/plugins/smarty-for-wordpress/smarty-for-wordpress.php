@@ -4,55 +4,107 @@ Plugin Name: Smarty for Wordpress
 Plugin URI: http://www.phkcorp.com?do=wordpress
 Description: Adds the Smarty Template Engine to Wordpress for ease of migration of themes
 Author: PHK Corporation for enablement
-Version: 3.1.27.1
+Version: 3.1.30.1
 Author URI: http://www.phkcorp.com/
 */
 
-require(dirname(__FILE__)."/libs/Smarty.class.php");
+//require_once(dirname(__FILE__)."/libs/Smarty.class.php");
+require_once(dirname(__FILE__)."/libs/SmartyBC.class.php");
+
+$s4w_smarty = null;
+
+function smarty_create_tempdir($s4w_smarty) {
+    if (is_array($s4w_smarty->template_dir)) {
+        foreach ($s4w_smarty->template_dir as $template_dir) {
+            if (@file_exists($template_dir) === false) {
+                @mkdir($template_dir);
+            }
+        }
+    } else {
+        if (file_exists($s4w_smarty->template_dir) === false) {
+            mkdir($s4w_smarty->template_dir);
+        }
+    }
+    if (is_array($s4w_smarty->compile_dir)) {
+        foreach ($s4w_smarty->compile_dir as $compile_dir) {
+            if (@file_exists($compile_dir) === false) {
+                @mkdir($compile_dir);
+            }
+        }
+    } else {
+        if (file_exists($s4w_smarty->compile_dir) === false) {
+            mkdir($s4w_smarty->compile_dir);
+        }
+    }
+    if (is_array($s4w_smarty->config_dir)) {
+        foreach ($s4w_smarty->config_dir as $config_dir) {
+            if (@file_exists($config_dir) === false) {
+                @mkdir($config_dir);
+            }
+        }
+    } else {
+        if (file_exists($s4w_smarty->config_dir) === false) {
+            mkdir($s4w_smarty->config_dir);
+        }
+    }
+    if (file_exists($s4w_smarty->cache_dir) === false) {
+        mkdir($s4w_smarty->cache_dir);
+        chmod($s4w_smarty->cache_dir, 0777 );
+    }
+}
 
 function smarty_get_instance($demo=FALSE)
 {
-	$smarty = new Smarty();
+        global $s4w_smarty;
 
+        if (get_option('s4w_smartybc','0') == '1') {
+            $s4w_smarty = new Smarty();
+        } else {
+            $s4w_smarty = new SmartyBC();
+        }
+        
 	$theme_path = smarty_get_themes_path();
 
 	if ($demo === TRUE) {
 		$demo_path =  plugin_dir_path( __FILE__ ) . 'demo';
 
-		$smarty->template_dir = $demo_path . "/templates";
-		$smarty->compile_dir  = $demo_path . "/templates_c";
-		$smarty->config_dir  = $demo_path . "/configs";
-		$smarty->cache_dir  = $demo_path . "/cache";
+		$s4w_smarty->template_dir = $demo_path . "/templates";
+		$s4w_smarty->compile_dir  = $demo_path . "/templates_c";
+		$s4w_smarty->config_dir  = $demo_path . "/configs";
+		$s4w_smarty->cache_dir  = $demo_path . "/cache";
 	} else if (defined('WP_USE_THEMES') && WP_USE_THEMES == true) {
-		$smarty->template_dir = $theme_path . "/templates";
-		$smarty->compile_dir  = $theme_path . "/templates_c";
-		$smarty->config_dir  = $theme_path . "/config";
-		$smarty->cache_dir  = $theme_path . "/cache";
-		//$smarty->plugins_dir[]  = $theme_path . "/plugins";
-		//$smarty->trusted_dir  = $theme_path . "/trusted";
+		$s4w_smarty->template_dir = $theme_path . "/templates";
+		$s4w_smarty->compile_dir  = $theme_path . "/templates_c";
+		$s4w_smarty->config_dir  = $theme_path . "/config";
+		$s4w_smarty->cache_dir  = $theme_path . "/cache";
+		//$s4w_smarty->plugins_dir[]  = $theme_path . "/plugins";
+		//$s4w_smarty->trusted_dir  = $theme_path . "/trusted";
 	} else {
 	    if (defined('SMARTY_PATH')) {
-			$smarty->template_dir = SMARTY_PATH . "/templates";
-			$smarty->compile_dir  = SMARTY_PATH . "/templates_c";
-			$smarty->config_dir  = SMARTY_PATH . "/config";
-			$smarty->cache_dir  = SMARTY_PATH . "/cache";
-			//$smarty->plugins_dir[]  = SMARTY_PATH . "/plugins";
-			//$smarty->trusted_dir  = SMARTY_PATH . "/trusted";
+			$s4w_smarty->template_dir = SMARTY_PATH . "/templates";
+			$s4w_smarty->compile_dir  = SMARTY_PATH . "/templates_c";
+			$s4w_smarty->config_dir  = SMARTY_PATH . "/config";
+			$s4w_smarty->cache_dir  = SMARTY_PATH . "/cache";
+			//$s4w_smarty->plugins_dir[]  = SMARTY_PATH . "/plugins";
+			//$s4w_smarty->trusted_dir  = SMARTY_PATH . "/trusted";
 	    }
 	}
+        
+        smarty_create_tempdir($s4w_smarty);
 
-	$smarty->auto_literal = (get_option('s4w_auto_literal','0') == '1' ?  true : false );
-	$smarty->cache_lifetime = get_option('s4w_cache_lifetime');
-	$smarty->cache_modified_check = (get_option('s4w_cache_modified_check','0') == '1' ? true : false );
-	$smarty->config_booleanize = (get_option('s4w_config_bolleanized','0') == '1' ? true : false );
-	$smarty->config_overwrite = (get_option('s4w_config_overwrite','0') == '1' ? true : false );
-	$smarty->config_read_hidden = (get_option('s4w_config_read_hidden','0') == '1' ? true : false );
-	$smarty->debugging = (get_option('s4w_debugging','0') == '1' ? true : false );
-	$smarty->force_compile = (get_option('s4w_force_compile','0') == '1' ? true : false );
-	$smarty->php_handling = get_option('s4w_php_handling',0);
-	$smarty->use_sub_dirs = (get_option('s4w_use_sub_dirs','0') == '1' ? true : false );
+        $s4w_smarty->smartybc = (get_option('s4w_smartybc','0') == '1' ?  true : false );
+	$s4w_smarty->auto_literal = (get_option('s4w_auto_literal','0') == '1' ?  true : false );
+	$s4w_smarty->cache_lifetime = get_option('s4w_cache_lifetime');
+	$s4w_smarty->cache_modified_check = (get_option('s4w_cache_modified_check','0') == '1' ? true : false );
+	$s4w_smarty->config_booleanize = (get_option('s4w_config_bolleanized','0') == '1' ? true : false );
+	$s4w_smarty->config_overwrite = (get_option('s4w_config_overwrite','0') == '1' ? true : false );
+	$s4w_smarty->config_read_hidden = (get_option('s4w_config_read_hidden','0') == '1' ? true : false );
+	$s4w_smarty->debugging = (get_option('s4w_debugging','0') == '1' ? true : false );
+	$s4w_smarty->force_compile = (get_option('s4w_force_compile','0') == '1' ? true : false );
+	$s4w_smarty->php_handling = get_option('s4w_php_handling',0);
+	$s4w_smarty->use_sub_dirs = (get_option('s4w_use_sub_dirs','0') == '1' ? true : false );
 
-	return $smarty;
+	return $s4w_smarty;
 }
 
 function smarty_load_template($atts, $content=null, $code="")
@@ -67,41 +119,51 @@ function smarty_load_template($atts, $content=null, $code="")
 	$name  = "{$name}";
 	$value = "{$value}";
 
-	$smarty = new Smarty();
-	$smarty->assign_by_ref($name,$value);
+        global $s4w_smarty;
+
+        if (get_option('s4w_smartybc','0') == '1') {
+            $s4w_smarty = new Smarty();
+        } else {
+            $s4w_smarty = new SmartyBC();
+        }
+
+        $s4w_smarty->assign_by_ref($name,$value);
 
 	$theme_path = smarty_get_themes_path();
 
 	if (defined('WP_USE_THEMES') && WP_USE_THEMES == true) {
-		$smarty->template_dir = $theme_path . "/templates";
-		$smarty->compile_dir  = $theme_path . "/templates_c";
-		$smarty->config_dir  = $theme_path . "/config";
-		$smarty->cache_dir  = $theme_path . "/cache";
-		//$smarty->plugins_dir[]  = $theme_path . "/plugins";
-		//$smarty->trusted_dir  = $theme_path . "/trusted";
+		$s4w_smarty->template_dir = $theme_path . "/templates";
+		$s4w_smarty->compile_dir  = $theme_path . "/templates_c";
+		$s4w_smarty->config_dir  = $theme_path . "/config";
+		$s4w_smarty->cache_dir  = $theme_path . "/cache";
+		//$s4w_smarty->plugins_dir[]  = $theme_path . "/plugins";
+		//$s4w_smarty->trusted_dir  = $theme_path . "/trusted";
 	} else {
 	    if (defined('SMARTY_PATH')) {
-			$smarty->template_dir = SMARTY_PATH . "/templates";
-			$smarty->compile_dir  = SMARTY_PATH . "/templates_c";
-			$smarty->config_dir  = SMARTY_PATH . "/config";
-			$smarty->cache_dir  = SMARTY_PATH . "/cache";
-			//$smarty->plugins_dir[]  = SMARTY_PATH . "/plugins";
-			//$smarty->trusted_dir  = SMARTY_PATH . "/trusted";
+			$s4w_smarty->template_dir = SMARTY_PATH . "/templates";
+			$s4w_smarty->compile_dir  = SMARTY_PATH . "/templates_c";
+			$s4w_smarty->config_dir  = SMARTY_PATH . "/config";
+			$s4w_smarty->cache_dir  = SMARTY_PATH . "/cache";
+			//$s4w_smarty->plugins_dir[]  = SMARTY_PATH . "/plugins";
+			//$s4w_smarty->trusted_dir  = SMARTY_PATH . "/trusted";
 	    }
 	}
 
-	$smarty->auto_literal = (get_option('s4w_auto_literal','0') == '1' ?  true : false );
-	$smarty->cache_lifetime = get_option('s4w_cache_lifetime');
-	$smarty->cache_modified_check = (get_option('s4w_cache_modified_check','0') == '1' ? true : false );
-	$smarty->config_booleanize = (get_option('s4w_config_bolleanized','0') == '1' ? true : false );
-	$smarty->config_overwrite = (get_option('s4w_config_overwrite','0') == '1' ? true : false );
-	$smarty->config_read_hidden = (get_option('s4w_config_read_hidden','0') == '1' ? true : false );
-	$smarty->debugging = (get_option('s4w_debugging','0') == '1' ? true : false );
-	$smarty->force_compile = (get_option('s4w_force_compile','0') == '1' ? true : false );
-	$smarty->php_handling = get_option('s4w_php_handling',0);
-	$smarty->use_sub_dirs = (get_option('s4w_use_sub_dirs','0') == '1' ? true : false );
+        smarty_create_tempdir($s4w_smarty);
+        
+        $s4w_smarty->smartybc = (get_option('s4w_smartybc','0') == '1' ?  true : false );
+	$s4w_smarty->auto_literal = (get_option('s4w_auto_literal','0') == '1' ?  true : false );
+	$s4w_smarty->cache_lifetime = get_option('s4w_cache_lifetime');
+	$s4w_smarty->cache_modified_check = (get_option('s4w_cache_modified_check','0') == '1' ? true : false );
+	$s4w_smarty->config_booleanize = (get_option('s4w_config_bolleanized','0') == '1' ? true : false );
+	$s4w_smarty->config_overwrite = (get_option('s4w_config_overwrite','0') == '1' ? true : false );
+	$s4w_smarty->config_read_hidden = (get_option('s4w_config_read_hidden','0') == '1' ? true : false );
+	$s4w_smarty->debugging = (get_option('s4w_debugging','0') == '1' ? true : false );
+	$s4w_smarty->force_compile = (get_option('s4w_force_compile','0') == '1' ? true : false );
+	$s4w_smarty->php_handling = get_option('s4w_php_handling',0);
+	$s4w_smarty->use_sub_dirs = (get_option('s4w_use_sub_dirs','0') == '1' ? true : false );
 
-	$smarty->display($tpl);
+	$s4w_smarty->display($tpl);
 }
 
 function smarty_assign_by_reference($atts, $content=null, $code="")
@@ -114,45 +176,54 @@ function smarty_assign_by_reference($atts, $content=null, $code="")
 	$name  = "{$name}";
 	$value = "{$value}";
 
-	$smarty = new Smarty();
+        global $s4w_smarty;
+
+        if (get_option('s4w_smartybc','0') == '1') {
+            $s4w_smarty = new Smarty();
+        } else {
+            $s4w_smarty = new SmartyBC();
+        }
 
 	$theme_path = smarty_get_themes_path();
 
 	if (defined('WP_USE_THEMES') && WP_USE_THEMES == true) {
-		$smarty->template_dir = $theme_path . "/templates";
-		$smarty->compile_dir  = $theme_path . "/templates_c";
-		$smarty->config_dir  = $theme_path . "/config";
-		$smarty->cache_dir  = $theme_path . "/cache";
-		//$smarty->plugins_dir[]  = $theme_path . "/plugins";
-		//$smarty->trusted_dir  = $theme_path . "/trusted";
+		$s4w_smarty->template_dir = $theme_path . "/templates";
+		$s4w_smarty->compile_dir  = $theme_path . "/templates_c";
+		$s4w_smarty->config_dir  = $theme_path . "/config";
+		$s4w_smarty->cache_dir  = $theme_path . "/cache";
+		//$s4w_smarty->plugins_dir[]  = $theme_path . "/plugins";
+		//$s4w_smarty->trusted_dir  = $theme_path . "/trusted";
 	} else {
 	    if (defined('SMARTY_PATH')) {
-			$smarty->template_dir = SMARTY_PATH . "/templates";
-			$smarty->compile_dir  = SMARTY_PATH . "/templates_c";
-			$smarty->config_dir  = SMARTY_PATH . "/config";
-			$smarty->cache_dir  = SMARTY_PATH . "/cache";
-			//$smarty->plugins_dir[]  = SMARTY_PATH . "/plugins";
-			//$smarty->trusted_dir  = SMARTY_PATH . "/trusted";
+			$s4w_smarty->template_dir = SMARTY_PATH . "/templates";
+			$s4w_smarty->compile_dir  = SMARTY_PATH . "/templates_c";
+			$s4w_smarty->config_dir  = SMARTY_PATH . "/config";
+			$s4w_smarty->cache_dir  = SMARTY_PATH . "/cache";
+			//$s4w_smarty->plugins_dir[]  = SMARTY_PATH . "/plugins";
+			//$s4w_smarty->trusted_dir  = SMARTY_PATH . "/trusted";
 	    }
 	}
+        
+        smarty_create_tempdir($s4w_smarty);
 
-	$smarty->auto_literal = (get_option('s4w_auto_literal','0') == '1' ?  true : false );
-	$smarty->cache_lifetime = get_option('s4w_cache_lifetime');
-	$smarty->cache_modified_check = (get_option('s4w_cache_modified_check','0') == '1' ? true : false );
-	$smarty->config_booleanize = (get_option('s4w_config_bolleanized','0') == '1' ? true : false );
-	$smarty->config_overwrite = (get_option('s4w_config_overwrite','0') == '1' ? true : false );
-	$smarty->config_read_hidden = (get_option('s4w_config_read_hidden','0') == '1' ? true : false );
-	$smarty->debugging = (get_option('s4w_debugging','0') == '1' ? true : false );
-	$smarty->force_compile = (get_option('s4w_force_compile','0') == '1' ? true : false );
-	$smarty->php_handling = get_option('s4w_php_handling',0);
-	$smarty->use_sub_dirs = (get_option('s4w_use_sub_dirs','0') == '1' ? true : false );
+        $s4w_smarty->smartybc = (get_option('s4w_smartybc','0') == '1' ?  true : false );
+	$s4w_smarty->auto_literal = (get_option('s4w_auto_literal','0') == '1' ?  true : false );
+	$s4w_smarty->cache_lifetime = get_option('s4w_cache_lifetime');
+	$s4w_smarty->cache_modified_check = (get_option('s4w_cache_modified_check','0') == '1' ? true : false );
+	$s4w_smarty->config_booleanize = (get_option('s4w_config_bolleanized','0') == '1' ? true : false );
+	$s4w_smarty->config_overwrite = (get_option('s4w_config_overwrite','0') == '1' ? true : false );
+	$s4w_smarty->config_read_hidden = (get_option('s4w_config_read_hidden','0') == '1' ? true : false );
+	$s4w_smarty->debugging = (get_option('s4w_debugging','0') == '1' ? true : false );
+	$s4w_smarty->force_compile = (get_option('s4w_force_compile','0') == '1' ? true : false );
+	$s4w_smarty->php_handling = get_option('s4w_php_handling',0);
+	$s4w_smarty->use_sub_dirs = (get_option('s4w_use_sub_dirs','0') == '1' ? true : false );
 
 	/**
 	 * per ticket #79 - function call 'assign_by_ref' is unknown or deprecated
 	 *
-	 * $smarty->assign_by_ref($name,$value);
+	 * $s4w_smarty->assign_by_ref($name,$value);
 	 */
-	$smarty->assignByRef($name,$value);
+	$s4w_smarty->assignByRef($name,$value);
 }
 
 function smarty_array_assign_by_reference($atts, $content=null, $code="")
@@ -168,7 +239,13 @@ function smarty_array_assign_by_reference($atts, $content=null, $code="")
 	$t1 = explode(",",$name);
 	$t2 = explode(",",$value);
 
-	$smarty = new Smarty();
+        global $s4w_smarty;
+
+        if (get_option('s4w_smartybc','0') == '1') {
+            $s4w_smarty = new Smarty();
+        } else {
+            $s4w_smarty = new SmartyBC();
+        }
 
 	$theme_path = smarty_get_themes_path();
 
@@ -177,79 +254,91 @@ function smarty_array_assign_by_reference($atts, $content=null, $code="")
 		/**
 		 * per ticket #79 - function call 'assign_by_ref' is unknown or deprecated
 		 *
-		 * $smarty->assign_by_ref($t1[$i],$t2[$i]);
+		 * $s4w_smarty->assign_by_ref($t1[$i],$t2[$i]);
 		 */
-	    $smarty->assignByRef($t1[$i],$t2[$i]);
+	    $s4w_smarty->assignByRef($t1[$i],$t2[$i]);
 	}
 
 	if (defined('WP_USE_THEMES') && WP_USE_THEMES == true) {
-		$smarty->template_dir = $theme_path . "/templates";
-		$smarty->compile_dir  = $theme_path . "/templates_c";
-		$smarty->config_dir  = $theme_path . "/config";
-		$smarty->cache_dir  = $theme_path . "/cache";
-		//$smarty->plugins_dir[]  = $theme_path . "/plugins";
-		//$smarty->trusted_dir  = $theme_path . "/trusted";
+		$s4w_smarty->template_dir = $theme_path . "/templates";
+		$s4w_smarty->compile_dir  = $theme_path . "/templates_c";
+		$s4w_smarty->config_dir  = $theme_path . "/config";
+		$s4w_smarty->cache_dir  = $theme_path . "/cache";
+		//$s4w_smarty->plugins_dir[]  = $theme_path . "/plugins";
+		//$s4w_smarty->trusted_dir  = $theme_path . "/trusted";
 	} else {
 	    if (defined('SMARTY_PATH')) {
-			$smarty->template_dir = SMARTY_PATH . "/templates";
-			$smarty->compile_dir  = SMARTY_PATH . "/templates_c";
-			$smarty->config_dir  = SMARTY_PATH . "/config";
-			$smarty->cache_dir  = SMARTY_PATH . "/cache";
-			//$smarty->plugins_dir[]  = SMARTY_PATH . "/plugins";
-			//$smarty->trusted_dir  = SMARTY_PATH . "/trusted";
+			$s4w_smarty->template_dir = SMARTY_PATH . "/templates";
+			$s4w_smarty->compile_dir  = SMARTY_PATH . "/templates_c";
+			$s4w_smarty->config_dir  = SMARTY_PATH . "/config";
+			$s4w_smarty->cache_dir  = SMARTY_PATH . "/cache";
+			//$s4w_smarty->plugins_dir[]  = SMARTY_PATH . "/plugins";
+			//$s4w_smarty->trusted_dir  = SMARTY_PATH . "/trusted";
 	    }
 	}
+        
+        smarty_create_tempdir($s4w_smarty);
 
-	$smarty->auto_literal = (get_option('s4w_auto_literal','0') == '1' ?  true : false );
-	$smarty->cache_lifetime = get_option('s4w_cache_lifetime');
-	$smarty->cache_modified_check = (get_option('s4w_cache_modified_check','0') == '1' ? true : false );
-	$smarty->config_booleanize = (get_option('s4w_config_bolleanized','0') == '1' ? true : false );
-	$smarty->config_overwrite = (get_option('s4w_config_overwrite','0') == '1' ? true : false );
-	$smarty->config_read_hidden = (get_option('s4w_config_read_hidden','0') == '1' ? true : false );
-	$smarty->debugging = (get_option('s4w_debugging','0') == '1' ? true : false );
-	$smarty->force_compile = (get_option('s4w_force_compile','0') == '1' ? true : false );
-	$smarty->php_handling = get_option('s4w_php_handling',0);
-	$smarty->use_sub_dirs = (get_option('s4w_use_sub_dirs','0') == '1' ? true : false );
+        $s4w_smarty->smartybc = (get_option('s4w_smartybc','0') == '1' ?  true : false );
+	$s4w_smarty->auto_literal = (get_option('s4w_auto_literal','0') == '1' ?  true : false );
+	$s4w_smarty->cache_lifetime = get_option('s4w_cache_lifetime');
+	$s4w_smarty->cache_modified_check = (get_option('s4w_cache_modified_check','0') == '1' ? true : false );
+	$s4w_smarty->config_booleanize = (get_option('s4w_config_bolleanized','0') == '1' ? true : false );
+	$s4w_smarty->config_overwrite = (get_option('s4w_config_overwrite','0') == '1' ? true : false );
+	$s4w_smarty->config_read_hidden = (get_option('s4w_config_read_hidden','0') == '1' ? true : false );
+	$s4w_smarty->debugging = (get_option('s4w_debugging','0') == '1' ? true : false );
+	$s4w_smarty->force_compile = (get_option('s4w_force_compile','0') == '1' ? true : false );
+	$s4w_smarty->php_handling = get_option('s4w_php_handling',0);
+	$s4w_smarty->use_sub_dirs = (get_option('s4w_use_sub_dirs','0') == '1' ? true : false );
 
-	$smarty->display($tpl);
+	$s4w_smarty->display($tpl);
 }
 
 function smarty_test_install($atts, $content=null, $code="")
 {
-	$smarty = new Smarty();
+        global $s4w_smarty;
+
+        if (get_option('s4w_smartybc','0') == '1') {
+            $s4w_smarty = new Smarty();
+        } else {
+            $s4w_smarty = new SmartyBC();
+        }
 
 	$theme_path = smarty_get_themes_path();
 
 	if (defined('WP_USE_THEMES') && WP_USE_THEMES == true) {
-		$smarty->template_dir = $theme_path . "/templates";
-		$smarty->compile_dir  = $theme_path . "/templates_c";
-		$smarty->config_dir  = $theme_path . "/config";
-		$smarty->cache_dir  = $theme_path . "/cache";
-		//$smarty->plugins_dir[]  = $theme_path . "/plugins";
-		//$smarty->trusted_dir  = $theme_path . "/trusted";
+		$s4w_smarty->template_dir = $theme_path . "/templates";
+		$s4w_smarty->compile_dir  = $theme_path . "/templates_c";
+		$s4w_smarty->config_dir  = $theme_path . "/config";
+		$s4w_smarty->cache_dir  = $theme_path . "/cache";
+		//$s4w_smarty->plugins_dir[]  = $theme_path . "/plugins";
+		//$s4w_smarty->trusted_dir  = $theme_path . "/trusted";
 	} else {
 	    if (defined('SMARTY_PATH')) {
-			$smarty->template_dir = SMARTY_PATH . "/templates";
-			$smarty->compile_dir  = SMARTY_PATH . "/templates_c";
-			$smarty->config_dir  = SMARTY_PATH . "/config";
-			$smarty->cache_dir  = SMARTY_PATH . "/cache";
-			//$smarty->plugins_dir[]  = SMARTY_PATH . "/plugins";
-			//$smarty->trusted_dir  = SMARTY_PATH . "/trusted";
+			$s4w_smarty->template_dir = SMARTY_PATH . "/templates";
+			$s4w_smarty->compile_dir  = SMARTY_PATH . "/templates_c";
+			$s4w_smarty->config_dir  = SMARTY_PATH . "/config";
+			$s4w_smarty->cache_dir  = SMARTY_PATH . "/cache";
+			//$s4w_smarty->plugins_dir[]  = SMARTY_PATH . "/plugins";
+			//$s4w_smarty->trusted_dir  = SMARTY_PATH . "/trusted";
 	    }
 	}
 
-	$smarty->auto_literal = (get_option('s4w_auto_literal','0') == '1' ?  true : false );
-	$smarty->cache_lifetime = get_option('s4w_cache_lifetime');
-	$smarty->cache_modified_check = (get_option('s4w_cache_modified_check','0') == '1' ? true : false );
-	$smarty->config_booleanize = (get_option('s4w_config_bolleanized','0') == '1' ? true : false );
-	$smarty->config_overwrite = (get_option('s4w_config_overwrite','0') == '1' ? true : false );
-	$smarty->config_read_hidden = (get_option('s4w_config_read_hidden','0') == '1' ? true : false );
-	$smarty->debugging = (get_option('s4w_debugging','0') == '1' ? true : false );
-	$smarty->force_compile = (get_option('s4w_force_compile','0') == '1' ? true : false );
-	$smarty->php_handling = get_option('s4w_php_handling',0);
-	$smarty->use_sub_dirs = (get_option('s4w_use_sub_dirs','0') == '1' ? true : false );
+        smarty_create_tempdir($s4w_smarty);
 
-	$smarty->testInstall();
+        $s4w_smarty->smartybc = (get_option('s4w_smartybc','0') == '1' ?  true : false );
+	$s4w_smarty->auto_literal = (get_option('s4w_auto_literal','0') == '1' ?  true : false );
+	$s4w_smarty->cache_lifetime = get_option('s4w_cache_lifetime');
+	$s4w_smarty->cache_modified_check = (get_option('s4w_cache_modified_check','0') == '1' ? true : false );
+	$s4w_smarty->config_booleanize = (get_option('s4w_config_bolleanized','0') == '1' ? true : false );
+	$s4w_smarty->config_overwrite = (get_option('s4w_config_overwrite','0') == '1' ? true : false );
+	$s4w_smarty->config_read_hidden = (get_option('s4w_config_read_hidden','0') == '1' ? true : false );
+	$s4w_smarty->debugging = (get_option('s4w_debugging','0') == '1' ? true : false );
+	$s4w_smarty->force_compile = (get_option('s4w_force_compile','0') == '1' ? true : false );
+	$s4w_smarty->php_handling = get_option('s4w_php_handling',0);
+	$s4w_smarty->use_sub_dirs = (get_option('s4w_use_sub_dirs','0') == '1' ? true : false );
+
+	$s4w_smarty->testInstall();
 }
 
 function smarty_load_demo($atts, $content=null, $code="") {
@@ -268,6 +357,7 @@ function displaySmartyManagementPage()
 {
 	if (isset($_POST['save']))
 	{
+                update_option('s4w_smartybc',(isset($_POST['smarty_bc']) ? '1' : '0'));
 		update_option('s4w_auto_literal',(isset($_POST['auto_literal']) ? '1' : '0'));
 		update_option('s4w_cache_lifetime',$_POST['cache_lifetime']);
 		update_option('s4w_cache_modified_check',(isset($_POST['cache_modified_check']) ? '1' : '0'));
@@ -280,6 +370,7 @@ function displaySmartyManagementPage()
 		update_option('s4w_use_sub_dirs',(isset($_POST['use_sub_dirs']) ? '1' : '0'));
 	}
 
+        $s4w_smartybc_checked = (get_option('s4w_smartybc','0') == '1' ? 'checked' : '');
 	$s4w_auto_literal_checked = (get_option('s4w_auto_literal','0') == '1' ? 'checked' : '');
 	$s4w_cache_lifetime = get_option('s4w_cache_lifetime');
 	$s4w_cache_modified_checked = (get_option('s4w_cache_modified_check','0') == '1' ? 'checked' : '');
@@ -315,6 +406,9 @@ function displaySmartyManagementPage()
 				<fieldset class='options'>
 					<legend><h2><u>Settings</u></h2></legend>
 					<table>
+						<tr>
+							<td>Enable SmartyBC</td><td><input type='checkbox' name='smarty_bc' <?php echo $s4w_smartybc_checked; ?> ></td>
+						</tr>
 						<tr>
 							<td>Auto literal</td><td><input type='checkbox' name='auto_literal' <?php echo $s4w_auto_literal_checked; ?> ></td>
 						</tr>
@@ -358,38 +452,50 @@ function displaySmartyManagementPage()
 				</form>
 				<fieldset class='options'>
 					<legend><h2><u>Tips &amp; Techniques</u></h2></legend>
-								<h3>Publication available on Amazon.com</h3>
-								<p><a href="http://www.amazon.com/dp/B00K5XTPL2" target="_blank"><img src="http://ecx.images-amazon.com/images/I/41qOnv4Ik5L._BO2,204,203,200_PIsitb-sticker-v3-big,TopRight,0,-55_SX278_SY278_PIkin4,BottomRight,1,22_AA300_SH20_OU01_.jpg"></a></p>
-								<p>Preparing your theme to accept Smarty templates:</p>
-								<ul>
-								<li>1. Create the four smarty directories (templates,templates_c,config,cache,plugins,trusted) under your theme path</li>
-								<li>2. Place your Smarty theme files in the templates path</li>
-								<li>3. Ensure that the templates_c path is writable</li>
-								<li>4. Create a Wordpress page and enter the following short code: [smarty-display tpl=home.tpl], where home.tpl is your smarty
-								template located in the templates path</li>
-								<li>5. If you want to pass a single variable with the template, use [smarty-display tpl=home.tpl name=myVariable value="some value"]</li>
-								<li>6. If you want to pass multiple variables to the template, use [smarty-array tpl=home.tpl name="my1,my2,my3" value="1,2,'text']</li>
-								<li>7. View the page and watch the magic happen!<li>
-								<li><strong>That's It!</strong></li>
-								</ul>
-								<p>The <i>home.tpl</i> contains: <code>Hello from Smarty! passing variable myVariable={$myVariable}</code></p>
-								<p>If you wish to use Smarty in your custom worpress php files, then simply invoke the <b>smarty_get_instance()</b> function
-								and an instance of the Smarty class will be returned with the directories preset to your current theme.</p>
-								<p>For example,<br><code>$mySmarty = smarty_get_instance();<br> $mySmarty->assign('name','value');<br>...</code></p>
-								<p>Providing multiple parameters to your Smarty templates,<br><code>[smarty-array tpl="test.tpl" name="my1,my2,my3" value="1,2,'test'"]</code><br>
-								<i>Where my1,my2,my3 are the names of your Smarty template variables while value contains the values of these variables to pass to the template, test.tpl.
-								(my1=1, my2=2, and my3='test')</i></p>
+                                        <table>
+                                            <th>Publication available on Amazon.com - $9.99</th>
+                                            <th>Publication available on Barnes & Noble - $5.00</th>
+                                            <tr>
+                                                <td><a href="http://www.amazon.com/dp/B00K5XTPL2" target="_blank"><img src="http://ecx.images-amazon.com/images/I/41qOnv4Ik5L._BO2,204,203,200_PIsitb-sticker-v3-big,TopRight,0,-55_SX278_SY278_PIkin4,BottomRight,1,22_AA300_SH20_OU01_.jpg"></a></td>
+                                                <td><a href="http://www.barnesandnoble.com/w/guide-to-the-smarty-for-wordpress-plugin-patrick-ingle/1123770360?ean=2940158127281" target="_blank"><img src="http://prodimage.images-bn.com/pimages/2940158127281_p0_v1_s192x300.jpg"</a></td>
+                                            </tr>
+                                        </table>
+                                        <p>Preparing your theme to accept Smarty templates:</p>
+                                        <ul>
+                                        <li>1. Create the four smarty directories (templates,templates_c,config,cache,plugins,trusted) under your theme path</li>
+                                        <li>2. Place your Smarty theme files in the templates path</li>
+                                        <li>3. Ensure that the templates_c path is writable</li>
+                                        <li>4. Create a Wordpress page and enter the following short code: [smarty-display tpl=home.tpl], where home.tpl is your smarty
+                                        template located in the templates path</li>
+                                        <li>5. If you want to pass a single variable with the template, use [smarty-display tpl=home.tpl name=myVariable value="some value"]</li>
+                                        <li>6. If you want to pass multiple variables to the template, use [smarty-array tpl=home.tpl name="my1,my2,my3" value="1,2,'text']</li>
+                                        <li>7. View the page and watch the magic happen!<li>
+                                        <li><strong>That's It!</strong></li>
+                                        </ul>
+                                        <p>The <i>home.tpl</i> contains: <code>Hello from Smarty! passing variable myVariable={$myVariable}</code></p>
+                                        <p>If you wish to use Smarty in your custom worpress php files, then simply invoke the <b>smarty_get_instance()</b> function
+                                        and an instance of the Smarty class will be returned with the directories preset to your current theme.</p>
+                                        <p>For example,<br><code>$mySmarty = smarty_get_instance();<br> $mySmarty->assign('name','value');<br>...</code></p>
+                                        <p>Providing multiple parameters to your Smarty templates,<br><code>[smarty-array tpl="test.tpl" name="my1,my2,my3" value="1,2,'test'"]</code><br>
+                                        <i>Where my1,my2,my3 are the names of your Smarty template variables while value contains the values of these variables to pass to the template, test.tpl.
+                                        (my1=1, my2=2, and my3='test')</i></p>
 				</fieldset>
 
 				<fieldset class='options'>
 					<legend><h2><u>About the Architecture</u></h2></legend>
-<p>This plugin is based on Smarty 3.1.27 version. When a stable update to Smarty is released, then this plugin will be updated.</p>
+<p>This plugin is based on Smarty 3.1.30 version. When a stable update to Smarty is released, then this plugin will be updated.</p>
 <p>This plugin provides a needed and often requested requirement to assist the migration of Smarty templates to Wordpress-compliant
 themes. While the full migration is always preferred, this plugin gives you a fast track to your Smarty migration, as well
 as to embed those flagship Smarty templates/plugins within your new Wordpress pages</p>
 <p>The first release of this plugin exposes the Smarty display and assign_by_ref functions to
 Wordpress as shortcodes.</p>
 				</fieldset>
+                        
+                        <fieldset class="options">
+                            <legend><h2><u>Support</u></h2></legend>
+                            <p>Support is provided from <a href="https://github.com/patrickingle/smarty-for-wordpress/issues" target="_blank">github.com</a> (opens in new window)</p>
+                            <p>You must have a free github.com account to post issue requests.</p>
+                        </fieldset>
 
 				<fieldset class='options'>
 					<legend><h2><u>Wordpress Development</u></h2></legend>
