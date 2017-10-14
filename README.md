@@ -39,6 +39,12 @@ wordpress.db: place outside the root path in ../data and specify in the wp-confi
 
 http://patrickingle.info/wordpress-sqlite/
 
+The archive file phpdesktop-wordpress-sqlite.zip contains the phpdesktop-msie executable. Download the archive, extract and then click on the executable. 
+
+Scroll down the page and press Login and the login credentials are: admin and password
+
+You can run from a USB drive to preview projects for a client when internet connectivity is not suitable.
+
 # Donations Appreciated & Accepted
 
 Click (or copy & paste) here: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AY6K2EV5VH9ZN
