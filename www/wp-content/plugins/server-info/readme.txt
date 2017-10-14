@@ -1,9 +1,9 @@
 === Server Info ===
 Contributors: usmanaliqureshi
-Tags: admin, dashboard, widget, server, info, PHP, version, operating system
+Tags: admin, dashboard, widget, server, info, PHP, version, operating system, wordpress, database
 Requires at least: 3.0
-Tested up to: 4.7
-Stable tag: 4.6
+Tested up to: 4.8
+Stable tag: 4.7.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -11,7 +11,7 @@ This plugin will show you very useful information about your hosting server such
 
 == Description ==
 
-This plugin will show you very useful information about the hosting server you are using e.g. PHP version, MySQL version, Server OS, Server Protocol, Server IP and other useful information.
+This plugin will show you useful information about the hosting server you are using e.g. PHP version, MySQL version, Server OS, Server Protocol, Server IP and other useful information. You can use the information displayed by this plugin to update any settings which is crucial for your website performance and other aspects.
 
 You will see the information about:
 
@@ -21,6 +21,14 @@ You will see the information about:
 * Server Hostname
 * MySQL Version
 * System Uptime
+* Active Theme
+* Active Plugins
+* Database Name
+* Database Username
+* Database Hostname
+* Database Charset
+* Database Collate
+* WordPress Debugging (Enabled/Disabled)
 * WordPress Memory Limit
 
 Please rate the Plugin if you find it useful, thanks.
@@ -37,17 +45,26 @@ Instructions for installing the Server Info Plugin.
 
 == Frequently Asked Questions ==
 
-= Does this plugin works with all major PHP versoins? =
+= Does this plugin works with all major PHP versions? =
 
-Yes, it works with all major PHP versions and I have tested it with PHP version 5.3, 5.4, 5.5 and 5.6.
+Yes, it works with all major PHP versions and I have tested it with PHP version 5.3, 5.4, 5.5, 5.6, 7.0 and 7.1.
 
 == Screenshots ==
 
-1. Separate Page for Detailed Server Information.
+1. WordPress Dashboard Widget.
 
-2. WordPress Dashboard Widget.
+2. Separate Page for Detailed Server Information.
 
 == Changelog ==
+
+= 2.5 =
+* Revamped UI
+* Added WordPress Information section
+* Fixed Multiple Bugs
+* Moved Server Info page under Settings
+
+= 2.0.1 =
+* Changed dashboard icon for the menu item of Server Info
 
 = 2.0 =
 * Removed MySQL Client Version

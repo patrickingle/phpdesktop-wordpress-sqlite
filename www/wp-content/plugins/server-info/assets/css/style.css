@@ -1,82 +1,129 @@
-
-@import url(http://fonts.googleapis.com/css?family=Lato);
+@import url(https://fonts.googleapis.com/css?family=Varela+Round);
 
 .infohouse_heading {
 
-	font-family: "Lato", sans-serif;
+    font-family: 'Varela Round', sans-serif;
 
-	font-size: 29px !important;
+    font-size: 29px !important;
+
+    text-transform: uppercase;
+
+}
+
+.server-info p {
+
+    font-weight: 300;
+
+    font-size: 15px;
+
+    color: #000;
+    
+    text-shadow: 2px 2px 2px #ecebeb;
 
 }
 
 .infohouse_settings_page {
 
-	padding: 20px;
+    padding: 0 20px 40px 20px;
 
-	font-family: "Lato", sans-serif;
-	
+    font-family: 'Varela Round', sans-serif;
+
+    height: auto;
+
+    overflow: auto;
+
 }
 
 .infohouse_table {
-	
+
     border: 1px solid rgba(0, 0, 0, 0.08);
-	
-    margin: 0 auto 0 auto;
-	
+
     background-color: #fff;
-	
+
     border-collapse: collapse;
-	
+
+    float: left;
+
+    margin-right: 20px;
+
+    margin-left: 6%;
+
+}
+
+.infohouse_table tr th {
+
+    text-transform: uppercase;
+
+    margin: 0;
+
+    border: 1px solid rgb(0, 115, 170);
+
+    text-align: center;
+
+    background: #0073aa;
+
+}
+
+.infohouse_table tr th h3 {
+
+    color: #fff;
+
 }
 
 .infohouse_table tr td {
-	
+
     padding: 0px 20px;
-	
+
     margin: 0;
-	
+
     border: 1px solid rgba(195, 195, 195, 0.08);
-	
+
     text-align: center;
-	
+
+    letter-spacing: 1px;
+
 }
 
 .infohouse_table tr.gray td {
-	
+
     padding: 0px 20px;
-	
+
     margin: 0;
-	
-	background: #FBFBFB;
-	
+
+    background: #f9f9f9;
+
     border: 1px solid rgba(195, 195, 195, 0.08);
-	
+
     text-align: center;
-	
+
 }
 
 .infohouse_table tr td p {
-	
-	padding: 0;
-	
-	margin: 0;
-	
-    font-family: 'Lato';
-	
+
+    padding: 0;
+
+    margin: 0;
+
+    font-family: 'Varela Round', sans-serif;
+
     font-weight: 400;
-	
+
     font-size: 12px;
-	
+
 }
 
 .infohouse_table tr td.view-more-info {
-	
-	padding: 15px 0 1px 0;
-	
+
+    padding: 15px 0 1px 0;
+
 }
 
 .dashboard_inf_table {
-	
-	width: 100%;
-	
+
+    width: 100%;
+
+    margin: 0;
+
+    float: none;
+
 }

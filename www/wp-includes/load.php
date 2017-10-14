@@ -472,12 +472,19 @@ function wp_using_ext_object_cache( $using = null ) {
  * @access private
  */
 function wp_start_object_cache() {
+	global $wp_filter;
+
 	$first_init = false;
  	if ( ! function_exists( 'wp_cache_init' ) ) {
 		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
 			require_once ( WP_CONTENT_DIR . '/object-cache.php' );
 			if ( function_exists( 'wp_cache_init' ) ) {
 				wp_using_ext_object_cache( true );
+			}
+
+			// Re-initialize any hooks added manually by object-cache.php
+			if ( $wp_filter ) {
+				$wp_filter = WP_Hook::build_preinitialized_hooks( $wp_filter );
 			}
 		}
 
@@ -508,7 +515,7 @@ function wp_start_object_cache() {
 	}
 
 	if ( function_exists( 'wp_cache_add_global_groups' ) ) {
-		wp_cache_add_global_groups( array( 'users', 'userlogins', 'usermeta', 'user_meta', 'useremail', 'userslugs', 'site-transient', 'site-options', 'site-lookup', 'blog-lookup', 'blog-details', 'site-details', 'rss', 'global-posts', 'blog-id-cache', 'networks', 'sites' ) );
+		wp_cache_add_global_groups( array( 'users', 'userlogins', 'usermeta', 'user_meta', 'useremail', 'userslugs', 'site-transient', 'site-options', 'blog-lookup', 'blog-details', 'site-details', 'rss', 'global-posts', 'blog-id-cache', 'networks', 'sites' ) );
 		wp_cache_add_non_persistent_groups( array( 'counts', 'plugins' ) );
 	}
 }
@@ -1053,6 +1060,24 @@ function wp_doing_ajax() {
 }
 
 /**
+ * Determines whether the current request is a WordPress cron request.
+ *
+ * @since 4.8.0
+ *
+ * @return bool True if it's a WordPress cron request, false otherwise.
+ */
+function wp_doing_cron() {
+	/**
+	 * Filters whether the current request is a WordPress cron request.
+	 *
+	 * @since 4.8.0
+	 *
+	 * @param bool $wp_doing_cron Whether the current request is a WordPress cron request.
+	 */
+	return apply_filters( 'wp_doing_cron', defined( 'DOING_CRON' ) && DOING_CRON );
+}
+
+/**
  * Check whether variable is a WordPress Error.
  *
  * Returns true if $thing is an object of the WP_Error class.
@@ -1064,4 +1089,24 @@ function wp_doing_ajax() {
  */
 function is_wp_error( $thing ) {
 	return ( $thing instanceof WP_Error );
+}
+
+/**
+ * Determines whether file modifications are allowed.
+ *
+ * @since 4.8.0
+ *
+ * @param string $context The usage context.
+ * @return bool True if file modification is allowed, false otherwise.
+ */
+function wp_is_file_mod_allowed( $context ) {
+	/**
+	 * Filters whether file modifications are allowed.
+	 *
+	 * @since 4.8.0
+	 *
+	 * @param bool   $file_mod_allowed Whether file modifications are allowed.
+	 * @param string $context          The usage context.
+	 */
+	return apply_filters( 'file_mod_allowed', ! defined( 'DISALLOW_FILE_MODS' ) || ! DISALLOW_FILE_MODS, $context );
 }

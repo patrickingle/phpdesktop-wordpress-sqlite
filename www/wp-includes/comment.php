@@ -44,7 +44,7 @@ function check_comment($author, $email, $url, $comment, $user_ip, $user_agent, $
 		return false;
 
 	/** This filter is documented in wp-includes/comment-template.php */
-	$comment = apply_filters( 'comment_text', $comment );
+	$comment = apply_filters( 'comment_text', $comment, null, array() );
 
 	// Check for the number of external links if a max allowed number is set.
 	if ( $max_links = get_option( 'comment_max_links' ) ) {
@@ -1003,12 +1003,6 @@ function get_page_of_comment( $comment_ID, $args = array() ) {
 		if ( $args['max_depth'] > 1 && 0 != $comment->comment_parent )
 			return get_page_of_comment( $comment->comment_parent, $args );
 
-		if ( 'desc' === get_option( 'comment_order' ) ) {
-			$compare = 'after';
-		} else {
-			$compare = 'before';
-		}
-
 		$comment_args = array(
 			'type'       => $args['type'],
 			'post_id'    => $comment->comment_post_ID,
@@ -1019,7 +1013,7 @@ function get_page_of_comment( $comment_ID, $args = array() ) {
 			'date_query' => array(
 				array(
 					'column' => "$wpdb->comments.comment_date_gmt",
-					$compare => $comment->comment_date_gmt,
+					'before' => $comment->comment_date_gmt,
 				)
 			),
 		);
@@ -2186,8 +2180,6 @@ function wp_update_comment($commentarr) {
 
 	$comment_ID = $data['comment_ID'];
 	$comment_post_ID = $data['comment_post_ID'];
-	$keys = array( 'comment_post_ID', 'comment_content', 'comment_author', 'comment_author_email', 'comment_approved', 'comment_karma', 'comment_author_url', 'comment_date', 'comment_date_gmt', 'comment_type', 'comment_parent', 'user_id', 'comment_agent', 'comment_author_IP' );
-	$data = wp_array_slice_assoc( $data, $keys );
 
 	/**
 	 * Filters the comment data immediately before it is updated in the database.
@@ -2201,6 +2193,9 @@ function wp_update_comment($commentarr) {
 	 * @param array $commentarr The new, raw comment data.
 	 */
 	$data = apply_filters( 'wp_update_comment_data', $data, $comment, $commentarr );
+
+	$keys = array( 'comment_post_ID', 'comment_content', 'comment_author', 'comment_author_email', 'comment_approved', 'comment_karma', 'comment_author_url', 'comment_date', 'comment_date_gmt', 'comment_type', 'comment_parent', 'user_id', 'comment_agent', 'comment_author_IP' );
+	$data = wp_array_slice_assoc( $data, $keys );
 
 	$rval = $wpdb->update( $wpdb->comments, $data, compact( 'comment_ID' ) );
 
@@ -3010,8 +3005,12 @@ function wp_handle_comment_submission( $comment_data ) {
 		 * @param int $comment_post_ID Post ID.
 		 */
 		do_action( 'comment_on_draft', $comment_post_ID );
-
-		return new WP_Error( 'comment_on_draft' );
+		
+		if ( current_user_can( 'read_post', $comment_post_ID ) ) {
+			return new WP_Error( 'comment_on_draft', __( 'Sorry, comments are not allowed for this item.' ), 403 );
+		} else {
+			return new WP_Error( 'comment_on_draft' );
+		}
 
 	} elseif ( post_password_required( $comment_post_ID ) ) {
 
@@ -3066,7 +3065,7 @@ function wp_handle_comment_submission( $comment_data ) {
 	$comment_type = '';
 
 	if ( get_option( 'require_name_email' ) && ! $user->exists() ) {
-		if ( 6 > strlen( $comment_author_email ) || '' == $comment_author ) {
+		if ( '' == $comment_author_email || '' == $comment_author ) {
 			return new WP_Error( 'require_name_email', __( '<strong>ERROR</strong>: please fill the required fields (name, email).' ), 200 );
 		} elseif ( ! is_email( $comment_author_email ) ) {
 			return new WP_Error( 'require_valid_email', __( '<strong>ERROR</strong>: please enter a valid email address.' ), 200 );

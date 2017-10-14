@@ -665,11 +665,19 @@
 
 		// Opens the panel.
 		open: function( menuControl ) {
+			var panel = this, close;
+
 			this.currentMenuControl = menuControl;
 
 			this.itemSectionHeight();
 
 			$( 'body' ).addClass( 'adding-menu-items' );
+
+			close = function() {
+				panel.close();
+				$( this ).off( 'click', close );
+			};
+			$( '#customize-preview' ).on( 'click', close );
 
 			// Collapse all controls.
 			_( this.currentMenuControl.getMenuItemControls() ).each( function( control ) {
@@ -1169,7 +1177,11 @@
 
 			// @todo It would be better if this was added directly on the setting itself, as opposed to the control.
 			control.setting.validate = function( value ) {
-				return parseInt( value, 10 );
+				if ( '' === value ) {
+					return 0;
+				} else {
+					return parseInt( value, 10 );
+				}
 			};
 
 			// Edit menu button.
@@ -1319,7 +1331,14 @@
 			this.container.find( '.menu-item-handle' ).on( 'click', function( e ) {
 				e.preventDefault();
 				e.stopPropagation();
-				var menuControl = control.getMenuControl();
+				var menuControl = control.getMenuControl(),
+					isDeleteBtn = $( e.target ).is( '.item-delete, .item-delete *' ),
+					isAddNewBtn = $( e.target ).is( '.add-new-menu-item, .add-new-menu-item *' );
+
+				if ( $( 'body' ).hasClass( 'adding-menu-items' ) && ! isDeleteBtn && ! isAddNewBtn ) {
+					api.Menus.availableMenuItemsPanel.close();
+				}
+
 				if ( menuControl.isReordering || menuControl.isSorting ) {
 					return;
 				}
@@ -1505,22 +1524,29 @@
 		 * Update item handle title when changed.
 		 */
 		_setupTitleUI: function() {
-			var control = this;
+			var control = this, titleEl;
 
+			// Ensure that whitespace is trimmed on blur so placeholder can be shown.
+			control.container.find( '.edit-menu-item-title' ).on( 'blur', function() {
+				$( this ).val( $.trim( $( this ).val() ) );
+			} );
+
+			titleEl = control.container.find( '.menu-item-title' );
 			control.setting.bind( function( item ) {
+				var trimmedTitle, titleText;
 				if ( ! item ) {
 					return;
 				}
+				trimmedTitle = $.trim( item.title );
 
-				var titleEl = control.container.find( '.menu-item-title' ),
-				    titleText = item.title || item.original_title || api.Menus.data.l10n.untitled;
+				titleText = trimmedTitle || item.original_title || api.Menus.data.l10n.untitled;
 
 				if ( item._invalid ) {
 					titleText = api.Menus.data.l10n.invalidTitleTpl.replace( '%s', titleText );
 				}
 
 				// Don't update to an empty title.
-				if ( item.title || item.original_title ) {
+				if ( trimmedTitle || item.original_title ) {
 					titleEl
 						.text( titleText )
 						.removeClass( 'no-title' );
@@ -2203,8 +2229,7 @@
 				}
 			} );
 
-			control.container.find( '.menu-delete' ).on( 'click', function( event ) {
-				event.stopPropagation();
+			control.container.find( '.menu-delete-item .button-link-delete' ).on( 'click', function( event ) {
 				event.preventDefault();
 				control.setting.set( false );
 			});

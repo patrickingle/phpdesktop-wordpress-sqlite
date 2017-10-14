@@ -286,6 +286,7 @@ class WP_REST_Request implements ArrayAccess {
 	 * @param string $key Header name.
 	 */
 	public function remove_header( $key ) {
+		$key = $this->canonicalize_header_name( $key );
 		unset( $this->headers[ $key ] );
 	}
 
@@ -353,7 +354,11 @@ class WP_REST_Request implements ArrayAccess {
 	 */
 	protected function get_parameter_order() {
 		$order = array();
-		$order[] = 'JSON';
+
+		$content_type = $this->get_content_type();
+		if ( $content_type['value'] === 'application/json' ) {
+			$order[] = 'JSON';
+		}
 
 		$this->parse_json_params();
 
@@ -364,7 +369,7 @@ class WP_REST_Request implements ArrayAccess {
 			$this->parse_body_params();
 		}
 
-		$accepts_body_data = array( 'POST', 'PUT', 'PATCH' );
+		$accepts_body_data = array( 'POST', 'PUT', 'PATCH', 'DELETE' );
 		if ( in_array( $this->method, $accepts_body_data ) ) {
 			$order[] = 'POST';
 		}
@@ -423,15 +428,8 @@ class WP_REST_Request implements ArrayAccess {
 	 * @param mixed  $value Parameter value.
 	 */
 	public function set_param( $key, $value ) {
-		switch ( $this->method ) {
-			case 'POST':
-				$this->params['POST'][ $key ] = $value;
-				break;
-
-			default:
-				$this->params['GET'][ $key ] = $value;
-				break;
-		}
+		$order = $this->get_parameter_order();
+		$this->params[ $order[0] ][ $key ] = $value;
 	}
 
 	/**
@@ -669,7 +667,12 @@ class WP_REST_Request implements ArrayAccess {
 			return true;
 		}
 
-		$params = json_decode( $this->get_body(), true );
+		$body = $this->get_body();
+		if ( empty( $body ) ) {
+			return true;
+		}
+
+		$params = json_decode( $body, true );
 
 		/*
 		 * Check for a parsing error.
@@ -818,17 +821,21 @@ class WP_REST_Request implements ArrayAccess {
 				continue;
 			}
 			foreach ( $this->params[ $type ] as $key => $value ) {
-				// if no sanitize_callback was specified, default to rest_parse_request_arg
-				// if a type was specified in the args.
-				if ( ! isset( $attributes['args'][ $key ]['sanitize_callback'] ) && ! empty( $attributes['args'][ $key ]['type'] ) ) {
-					$attributes['args'][ $key ]['sanitize_callback'] = 'rest_parse_request_arg';
+				if ( ! isset( $attributes['args'][ $key ] ) ) {
+					continue;
 				}
-				// Check if this param has a sanitize_callback added.
-				if ( ! isset( $attributes['args'][ $key ] ) || empty( $attributes['args'][ $key ]['sanitize_callback'] ) ) {
+				$param_args = $attributes['args'][ $key ];
+
+				// If the arg has a type but no sanitize_callback attribute, default to rest_parse_request_arg.
+				if ( ! array_key_exists( 'sanitize_callback', $param_args ) && ! empty( $param_args['type'] ) ) {
+					$param_args['sanitize_callback'] = 'rest_parse_request_arg';
+				}
+				// If there's still no sanitize_callback, nothing to do here.
+				if ( empty( $param_args['sanitize_callback'] ) ) {
 					continue;
 				}
 
-				$sanitized_value = call_user_func( $attributes['args'][ $key ]['sanitize_callback'], $value, $this, $key );
+				$sanitized_value = call_user_func( $param_args['sanitize_callback'], $value, $this, $key );
 
 				if ( is_wp_error( $sanitized_value ) ) {
 					$invalid_params[ $key ] = $sanitized_value->get_error_message();

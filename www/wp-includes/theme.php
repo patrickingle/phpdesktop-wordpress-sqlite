@@ -950,18 +950,18 @@ function remove_theme_mods() {
 }
 
 /**
- * Retrieves the custom header text color in HEX format.
+ * Retrieves the custom header text color in 3- or 6-digit hexadecimal form.
  *
  * @since 2.1.0
  *
- * @return string Header text color in HEX format (minus the hash symbol).
+ * @return string Header text color in 3- or 6-digit hexadecimal form (minus the hash symbol).
  */
 function get_header_textcolor() {
 	return get_theme_mod('header_textcolor', get_theme_support( 'custom-header', 'default-text-color' ) );
 }
 
 /**
- * Displays the custom header text color in HEX format (minus the hash symbol).
+ * Displays the custom header text color in 3- or 6-digit hexadecimal form (minus the hash symbol).
  *
  * @since 2.1.0
  */
@@ -1325,25 +1325,35 @@ function has_header_video() {
 	return (bool) get_header_video_url();
 }
 
-/* Retrieve header video URL for custom header.
+/**
+ * Retrieve header video URL for custom header.
  *
- * Uses a local video if present, or falls back to an external video. Returns false if there is no video.
+ * Uses a local video if present, or falls back to an external video.
  *
  * @since 4.7.0
  *
- * @return string|false
+ * @return string|false Header video URL or false if there is no video.
  */
 function get_header_video_url() {
 	$id = absint( get_theme_mod( 'header_video' ) );
 	$url = esc_url( get_theme_mod( 'external_header_video' ) );
 
-	if ( ! $id && ! $url ) {
-		return false;
-	}
-
 	if ( $id ) {
 		// Get the file URL from the attachment ID.
 		$url = wp_get_attachment_url( $id );
+	}
+
+	/**
+	 * Filters the header video URL.
+	 *
+	 * @since 4.7.3
+	 *
+	 * @param string $url Header video URL, if available.
+	 */
+	$url = apply_filters( 'get_header_video_url', $url );
+
+	if ( ! $id && ! $url ) {
+		return false;
 	}
 
 	return esc_url_raw( set_url_scheme( $url ) );
@@ -1554,7 +1564,7 @@ function _custom_background_cb() {
 	$style = $color ? "background-color: #$color;" : '';
 
 	if ( $background ) {
-		$image = " background-image: url(" . wp_json_encode( $background ) . ");";
+		$image = ' background-image: url("' . esc_url_raw( $background ) . '");';
 
 		// Background Position.
 		$position_x = get_theme_mod( 'background_position_x', get_theme_support( 'custom-background', 'default-position-x' ) );
@@ -1643,7 +1653,8 @@ function wp_get_custom_css_post( $stylesheet = '' ) {
 		'no_found_rows'          => true,
 		'cache_results'          => true,
 		'update_post_meta_cache' => false,
-		'update_term_meta_cache' => false,
+		'update_post_term_cache' => false,
+		'lazy_load_term_meta'    => false,
 	);
 
 	$post = null;
@@ -1652,18 +1663,17 @@ function wp_get_custom_css_post( $stylesheet = '' ) {
 
 		if ( $post_id > 0 && get_post( $post_id ) ) {
 			$post = get_post( $post_id );
-		} else {
+		}
+
+		// `-1` indicates no post exists; no query necessary.
+		if ( ! $post && -1 !== $post_id ) {
 			$query = new WP_Query( $custom_css_query_vars );
 			$post = $query->post;
 			/*
-			 * Cache the lookup. See WP_Customize_Custom_CSS_Setting::update().
+			 * Cache the lookup. See wp_update_custom_css_post().
 			 * @todo This should get cleared if a custom_css post is added/removed.
 			 */
-			if ( $post ) {
-				set_theme_mod( 'custom_css_post_id', $post->ID );
-			} elseif ( -1 !== $post_id ) {
-				set_theme_mod( 'custom_css_post_id', -1 );
-			}
+			set_theme_mod( 'custom_css_post_id', $post ? $post->ID : -1 );
 		}
 	} else {
 		$query = new WP_Query( $custom_css_query_vars );
@@ -1695,7 +1705,7 @@ function wp_get_custom_css( $stylesheet = '' ) {
 	}
 
 	/**
-	 * Modify the Custom CSS Output into the <head>.
+	 * Filters the Custom CSS Output into the <head>.
 	 *
 	 * @since 4.7.0
 	 *
@@ -1787,9 +1797,15 @@ function wp_update_custom_css_post( $css, $args = array() ) {
 	} else {
 		$r = wp_insert_post( wp_slash( $post_data ), true );
 
-		// Trigger creation of a revision. This should be removed once #30854 is resolved.
-		if ( ! is_wp_error( $r ) && 0 === count( wp_get_post_revisions( $r ) ) ) {
-			wp_save_post_revision( $r );
+		if ( ! is_wp_error( $r ) ) {
+			if ( get_stylesheet() === $args['stylesheet'] ) {
+				set_theme_mod( 'custom_css_post_id', $r );
+			}
+
+			// Trigger creation of a revision. This should be removed once #30854 is resolved.
+			if ( 0 === count( wp_get_post_revisions( $r ) ) ) {
+				wp_save_post_revision( $r );
+			}
 		}
 	}
 
@@ -1932,15 +1948,19 @@ function get_theme_starter_content() {
 			'text_business_info' => array( 'text', array(
 				'title' => _x( 'Find Us', 'Theme starter content' ),
 				'text' => join( '', array(
-					'<p><strong>' . _x( 'Address', 'Theme starter content' ) . '</strong><br />',
-					_x( '123 Main Street', 'Theme starter content' ) . '<br />' . _x( 'New York, NY 10001', 'Theme starter content' ) . '</p>',
-					'<p><strong>' . _x( 'Hours', 'Theme starter content' ) . '</strong><br />',
-					_x( 'Monday&mdash;Friday: 9:00AM&ndash;5:00PM', 'Theme starter content' ) . '<br />' . _x( 'Saturday &amp; Sunday: 11:00AM&ndash;3:00PM', 'Theme starter content' ) . '</p>'
+					'<strong>' . _x( 'Address', 'Theme starter content' ) . "</strong>\n",
+					_x( '123 Main Street', 'Theme starter content' ) . "\n" . _x( 'New York, NY 10001', 'Theme starter content' ) . "\n\n",
+					'<strong>' . _x( 'Hours', 'Theme starter content' ) . "</strong>\n",
+					_x( 'Monday&mdash;Friday: 9:00AM&ndash;5:00PM', 'Theme starter content' ) . "\n" . _x( 'Saturday &amp; Sunday: 11:00AM&ndash;3:00PM', 'Theme starter content' )
 				) ),
+				'filter' => true,
+				'visual' => true,
 			) ),
 			'text_about' => array( 'text', array(
 				'title' => _x( 'About This Site', 'Theme starter content' ),
 				'text' => _x( 'This may be a good place to introduce yourself and your site or include some credits.', 'Theme starter content' ),
+				'filter' => true,
+				'visual' => true,
 			) ),
 			'archives' => array( 'archives', array(
 				'title' => _x( 'Archives', 'Theme starter content' ),
@@ -1965,7 +1985,12 @@ function get_theme_starter_content() {
 			) ),
 		),
 		'nav_menus' => array(
-			'page_home' => array(
+			'link_home' => array(
+				'type' => 'custom',
+				'title' => _x( 'Home', 'Theme starter content' ),
+				'url' => home_url( '/' ),
+			),
+			'page_home' => array( // Deprecated in favor of link_home.
 				'type' => 'post_type',
 				'object' => 'page',
 				'object_id' => '{{home}}',
@@ -3037,4 +3062,66 @@ function is_customize_preview() {
 	global $wp_customize;
 
 	return ( $wp_customize instanceof WP_Customize_Manager ) && $wp_customize->is_preview();
+}
+
+/**
+ * Make sure that auto-draft posts get their post_date bumped to prevent premature garbage-collection.
+ *
+ * When a changeset is updated but remains an auto-draft, ensure the post_date
+ * for the auto-draft posts remains the same so that it will be
+ * garbage-collected at the same time by `wp_delete_auto_drafts()`. Otherwise,
+ * if the changeset is updated to be a draft then update the posts
+ * to have a far-future post_date so that they will never be garbage collected
+ * unless the changeset post itself is deleted.
+ *
+ * @since 4.8.0
+ * @access private
+ * @see wp_delete_auto_drafts()
+ *
+ * @param string   $new_status Transition to this post status.
+ * @param string   $old_status Previous post status.
+ * @param \WP_Post $post       Post data.
+ * @global wpdb $wpdb
+ */
+function _wp_keep_alive_customize_changeset_dependent_auto_drafts( $new_status, $old_status, $post ) {
+	global $wpdb;
+	unset( $old_status );
+
+	// Short-circuit if not a changeset or if the changeset was published.
+	if ( 'customize_changeset' !== $post->post_type || 'publish' === $new_status ) {
+		return;
+	}
+
+	if ( 'auto-draft' === $new_status ) {
+		/*
+		 * Keep the post date for the post matching the changeset
+		 * so that it will not be garbage-collected before the changeset.
+		 */
+		$new_post_date = $post->post_date;
+	} else {
+		/*
+		 * Since the changeset no longer has an auto-draft (and it is not published)
+		 * it is now a persistent changeset, a long-lived draft, and so any
+		 * associated auto-draft posts should have their dates
+		 * pushed out very far into the future to prevent them from ever
+		 * being garbage-collected.
+		 */
+		$new_post_date = gmdate( 'Y-m-d H:i:d', strtotime( '+100 years' ) );
+	}
+
+	$data = json_decode( $post->post_content, true );
+	if ( empty( $data['nav_menus_created_posts']['value'] ) ) {
+		return;
+	}
+	foreach ( $data['nav_menus_created_posts']['value'] as $post_id ) {
+		if ( empty( $post_id ) || 'auto-draft' !== get_post_status( $post_id ) ) {
+			continue;
+		}
+		$wpdb->update(
+			$wpdb->posts,
+			array( 'post_date' => $new_post_date ), // Note wp_delete_auto_drafts() only looks at this this date.
+			array( 'ID' => $post_id )
+		);
+		clean_post_cache( $post_id );
+	}
 }
